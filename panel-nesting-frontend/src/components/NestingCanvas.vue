@@ -8,7 +8,7 @@
       </el-button-group>
       <span class="utilization-text">材料利用率: {{ (result.utilization * 100).toFixed(1) }}%</span>
     </div>
-    <canvas ref="canvasRef" @mousemove="onMouseMove" @mouseleave="onMouseLeave"></canvas>
+    <canvas ref="canvasRef" @mousemove="onMouseMove" @mouseleave="onMouseLeave" @click="onCanvasClick"></canvas>
   </div>
 </template>
 
@@ -21,15 +21,18 @@ const props = defineProps<{
   sheet: Sheet
   parts: Part[]
   hoveredPartName: string | null
+  placingAvoidZone: boolean
 }>()
 
 const emit = defineEmits<{
   hoverPart: [name: string | null]
+  placeAvoidZone: [cx: number, cy: number]
 }>()
 
 const containerRef = ref<HTMLDivElement>()
 const canvasRef = ref<HTMLCanvasElement>()
 const currentSheet = ref(0)
+const mouseSheetPos = ref<{ x: number; y: number } | null>(null)
 
 const COLORS = [
   '#4FC3F7', '#FF8A65', '#81C784', '#BA68C8', '#FFD54F',
@@ -99,6 +102,20 @@ function draw() {
   ctx.textBaseline = 'top'
   ctx.fillText(`${sheet.width} × ${sheet.height} mm`, offsetX + sheet.width * scale / 2, offsetY + sheet.height * scale + 8)
 
+  // Draw ghost avoid zone when in placing mode
+  if (props.placingAvoidZone && mouseSheetPos.value) {
+    const ghostR = 8 * scale
+    ctx.beginPath()
+    ctx.arc(offsetX + mouseSheetPos.value.x * scale, offsetY + mouseSheetPos.value.y * scale, ghostR, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(64, 158, 255, 0.2)'
+    ctx.fill()
+    ctx.strokeStyle = '#409eff'
+    ctx.lineWidth = 1.5
+    ctx.setLineDash([3, 3])
+    ctx.stroke()
+    ctx.setLineDash([])
+  }
+
   // Draw placements only when result exists
   if (!props.result) return
 
@@ -141,7 +158,24 @@ function draw() {
 
 function onMouseMove(e: MouseEvent) {
   const canvas = canvasRef.value
-  if (!canvas || !props.result) return
+  if (!canvas) return
+
+  const rect = canvas.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+
+  // Track mouse sheet position for ghost avoid zone
+  if (props.placingAvoidZone) {
+    const pos = canvasToSheet(x, y)
+    if (pos) {
+      mouseSheetPos.value = pos
+    } else {
+      mouseSheetPos.value = null
+    }
+    return
+  }
+
+  if (!props.result) return
 
   const rect = canvas.getBoundingClientRect()
   const x = e.clientX - rect.left
@@ -173,9 +207,38 @@ function onMouseMove(e: MouseEvent) {
 
 function onMouseLeave() {
   emit('hoverPart', null)
+  mouseSheetPos.value = null
 }
 
-watch(() => [props.sheet, props.result, currentSheet.value, props.hoveredPartName], draw, { deep: true })
+function canvasToSheet(canvasX: number, canvasY: number): { x: number; y: number } | null {
+  const canvas = canvasRef.value
+  if (!canvas) return null
+  const sheet = props.sheet
+  const padding = 40
+  const scaleX = (canvas.clientWidth - 2 * padding) / sheet.width
+  const scaleY = (canvas.clientHeight - 2 * padding) / sheet.height
+  const scale = Math.min(scaleX, scaleY)
+  const offsetX = (canvas.clientWidth - sheet.width * scale) / 2
+  const offsetY = (canvas.clientHeight - sheet.height * scale) / 2
+
+  const sx = (canvasX - offsetX) / scale
+  const sy = (canvasY - offsetY) / scale
+  if (sx < 0 || sx > sheet.width || sy < 0 || sy > sheet.height) return null
+  return { x: Math.round(sx), y: Math.round(sy) }
+}
+
+function onCanvasClick(e: MouseEvent) {
+  if (!props.placingAvoidZone) return
+  const canvas = canvasRef.value
+  if (!canvas) return
+  const rect = canvas.getBoundingClientRect()
+  const pos = canvasToSheet(e.clientX - rect.left, e.clientY - rect.top)
+  if (pos) {
+    emit('placeAvoidZone', pos.x, pos.y)
+  }
+}
+
+watch(() => [props.sheet, props.result, currentSheet.value, props.hoveredPartName, mouseSheetPos.value], draw, { deep: true })
 
 let resizeObserver: ResizeObserver | null = null
 onMounted(() => {
@@ -207,6 +270,6 @@ onUnmounted(() => resizeObserver?.disconnect())
 }
 canvas {
   flex: 1;
-  cursor: crosshair;
+  cursor: v-bind("placingAvoidZone ? 'crosshair' : 'default'");
 }
 </style>

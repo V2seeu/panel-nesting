@@ -3,7 +3,7 @@
     <h1 class="page-title">CNC 拼板排样系统</h1>
     <div class="main-layout" ref="layoutRef">
       <div class="left-panel" :style="{ width: leftWidth + 'px' }">
-        <SheetConfig v-model="sheet" />
+        <SheetConfig v-model="sheet" v-model:placingAvoidZone="placingAvoidZone" />
         <PartInput v-model="parts" :hoveredPartName="hoveredPartName" @hoverPart="onCanvasHover" />
         <el-button type="primary" size="large" class="compute-btn"
                    :loading="loading" @click="compute">
@@ -23,7 +23,9 @@
       <div class="right-panel">
         <NestingCanvas :result="result" :sheet="sheet" :parts="parts"
                        :hoveredPartName="hoveredPartName"
-                       @hoverPart="onCanvasHover" />
+                       :placingAvoidZone="placingAvoidZone"
+                       @hoverPart="onCanvasHover"
+                       @placeAvoidZone="onPlaceAvoidZone" />
       </div>
     </div>
   </div>
@@ -64,6 +66,7 @@ const parts = ref<Part[]>([
 const result = ref<NestingResult | null>(null)
 const loading = ref(false)
 const hoveredPartName = ref<string | null>(null)
+const placingAvoidZone = ref(false)
 
 async function compute() {
   loading.value = true
@@ -79,6 +82,11 @@ async function compute() {
 
 function onCanvasHover(name: string | null) {
   hoveredPartName.value = name
+}
+
+function onPlaceAvoidZone(cx: number, cy: number) {
+  sheet.value.avoidZones.push({ cx, cy, radius: 8 })
+  placingAvoidZone.value = false
 }
 
 // --- Resize drag logic ---
