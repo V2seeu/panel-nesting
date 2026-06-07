@@ -6,26 +6,16 @@
          @mouseleave="emit('hoverPart', null)">
       <div class="part-color-bar" :style="{ backgroundColor: colors[idx % colors.length] }"></div>
       <div class="part-fields">
-        <el-row :gutter="8">
-          <el-col :span="6">
-            <el-input v-model="part.name" placeholder="名称" size="small" />
-          </el-col>
-          <el-col :span="5">
-            <el-input-number v-model="part.width" :min="1" placeholder="宽" size="small" style="width:100%" />
-          </el-col>
-          <el-col :span="5">
-            <el-input-number v-model="part.height" :min="1" placeholder="高" size="small" style="width:100%" />
-          </el-col>
-          <el-col :span="4">
-            <el-input-number v-model="part.quantity" :min="1" placeholder="数量" size="small" style="width:100%" />
-          </el-col>
-          <el-col :span="2">
-            <el-checkbox v-model="part.rotatable" size="small">旋转</el-checkbox>
-          </el-col>
-          <el-col :span="2">
-            <el-button type="danger" :icon="Delete" circle size="small" @click="parts.splice(idx, 1)" />
-          </el-col>
-        </el-row>
+        <div class="part-row">
+          <el-input v-model="part.name" placeholder="名称" size="small" class="field-name" />
+          <el-input-number v-model="part.width" :min="1" placeholder="宽" size="small" controls-position="right" class="field-num" />
+          <el-input-number v-model="part.height" :min="1" placeholder="高" size="small" controls-position="right" class="field-num" />
+          <el-input-number v-model="part.quantity" :min="1" placeholder="数" size="small" controls-position="right" class="field-qty" />
+          <el-tooltip content="允许旋转90°" placement="top">
+            <el-checkbox v-model="part.rotatable" size="small" class="field-rotate">转</el-checkbox>
+          </el-tooltip>
+          <el-button type="danger" :icon="Delete" circle size="small" @click="parts.splice(idx, 1)" />
+        </div>
       </div>
     </div>
     <el-button type="primary" link @click="addPart">+ 添加零件</el-button>
@@ -79,6 +69,28 @@ function addPart() {
 }
 .part-fields {
   flex: 1;
+  min-width: 0;
+}
+.part-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.field-name {
+  width: 70px;
+  flex-shrink: 0;
+}
+.field-num {
+  width: 80px;
+  flex-shrink: 0;
+}
+.field-qty {
+  width: 60px;
+  flex-shrink: 0;
+}
+.field-rotate {
+  flex-shrink: 0;
+  margin-right: 0;
 }
 .part-item--highlighted {
   background-color: #ecf5ff;
