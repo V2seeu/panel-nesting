@@ -16,6 +16,8 @@ public class GeneticOptimizer {
     private static final int TOURNAMENT_K = 3;
     private static final int STAGNATION_LIMIT = 40;
 
+    private static final System.Logger log = System.getLogger(GeneticOptimizer.class.getName());
+
     private final Random random;
     private final Sheet sheet;
     private final List<Part> expandedParts;
@@ -65,7 +67,18 @@ public class GeneticOptimizer {
                 stagnationCount++;
             }
 
-            if (stagnationCount >= STAGNATION_LIMIT) break;
+            if (stagnationCount >= STAGNATION_LIMIT) {
+                log.log(System.Logger.Level.INFO,
+                        "GA 第 {0} 代停滞 {1} 代无改善, 提前终止",
+                        gen, stagnationCount);
+                break;
+            }
+
+            if (gen % 50 == 0) {
+                log.log(System.Logger.Level.INFO,
+                        "GA 第 {0} 代: 最优利用率 {1}%",
+                        gen, String.format("%.1f", bestFitness * 100));
+            }
 
             population = nextGeneration(population, fitnesses);
         }

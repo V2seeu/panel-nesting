@@ -7,6 +7,8 @@ import java.util.List;
 
 public class NestingEngine {
 
+    private static final System.Logger log = System.getLogger(NestingEngine.class.getName());
+
     public static NestingResult nest(NestingRequest request) {
         Sheet sheet = request.sheet();
         List<Part> parts = request.parts();
@@ -18,6 +20,10 @@ public class NestingEngine {
                 expanded.add(new Part(p.id() + "_" + i, p.name(), p.width(), p.height(), 1, p.rotatable()));
             }
         }
+
+        log.log(System.Logger.Level.INFO,
+                "展开零件列表: {0} 种 -> {1} 个实际零件",
+                parts.size(), expanded.size());
 
         if (expanded.isEmpty()) {
             return new NestingResult(0, 0, List.of());
