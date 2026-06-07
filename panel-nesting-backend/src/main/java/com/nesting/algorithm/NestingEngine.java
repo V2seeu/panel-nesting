@@ -12,6 +12,7 @@ public class NestingEngine {
     public static NestingResult nest(NestingRequest request) {
         Sheet sheet = request.sheet();
         List<Part> parts = request.parts();
+        OptimizationStrategy strategy = request.strategy();
 
         // Expand parts by quantity
         List<Part> expanded = new ArrayList<>();
@@ -22,15 +23,15 @@ public class NestingEngine {
         }
 
         log.log(System.Logger.Level.INFO,
-                "展开零件列表: {0} 种 -> {1} 个实际零件",
-                parts.size(), expanded.size());
+                "展开零件列表: {0} 种 -> {1} 个实际零件, 策略: {2}",
+                parts.size(), expanded.size(), strategy);
 
         if (expanded.isEmpty()) {
             return new NestingResult(0, 0, List.of());
         }
 
         // Use genetic algorithm to find good ordering
-        GeneticOptimizer optimizer = new GeneticOptimizer(sheet, expanded);
+        GeneticOptimizer optimizer = new GeneticOptimizer(sheet, expanded, strategy);
         GeneticOptimizer.OptimizationResult optResult = optimizer.optimize();
 
         // Build NestingResult from the best placement

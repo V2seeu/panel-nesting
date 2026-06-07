@@ -5,6 +5,15 @@
       <div class="left-panel" :style="{ width: leftWidth + 'px' }">
         <SheetConfig v-model="sheet" v-model:placingAvoidZone="placingAvoidZone" />
         <PartInput v-model="parts" :hoveredPartName="hoveredPartName" @hoverPart="onCanvasHover" />
+        <el-card>
+          <template #header>优化策略</template>
+          <el-select v-model="strategy" style="width: 100%">
+            <el-option label="利用率优先" value="UTILIZATION" />
+            <el-option label="板材数优先" value="SHEET_COUNT" />
+            <el-option label="切缝最短" value="MIN_SEAM" />
+            <el-option label="齐边优先" value="ALIGN_EDGE" />
+          </el-select>
+        </el-card>
         <el-button type="primary" size="large" class="compute-btn"
                    :loading="loading" @click="compute">
           开始排样
@@ -37,7 +46,7 @@ import SheetConfig from '../components/SheetConfig.vue'
 import PartInput from '../components/PartInput.vue'
 import NestingCanvas from '../components/NestingCanvas.vue'
 import { computeNesting } from '../api/nesting'
-import type { Sheet, Part, NestingResult } from '../types'
+import type { Sheet, Part, NestingResult, OptimizationStrategy } from '../types'
 
 const layoutRef = ref<HTMLDivElement>()
 const leftWidth = ref(420)
@@ -67,11 +76,12 @@ const result = ref<NestingResult | null>(null)
 const loading = ref(false)
 const hoveredPartName = ref<string | null>(null)
 const placingAvoidZone = ref(false)
+const strategy = ref<OptimizationStrategy>('UTILIZATION')
 
 async function compute() {
   loading.value = true
   try {
-    result.value = await computeNesting({ sheet: sheet.value, parts: parts.value })
+    result.value = await computeNesting({ sheet: sheet.value, parts: parts.value, strategy: strategy.value })
   } catch (e) {
     console.error('排样计算失败', e)
     alert('排样计算失败，请检查参数')

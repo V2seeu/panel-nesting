@@ -16,10 +16,11 @@ public class NestingController {
 
     @PostMapping("/compute")
     public NestingResult compute(@RequestBody NestingRequest request) {
-        log.info("收到排样请求: 板材 {}x{}, 零件种类 {}, 总数量 {}",
+        log.info("收到排样请求: 板材 {}x{}, 零件种类 {}, 总数量 {}, 策略: {}",
                 request.sheet().width(), request.sheet().height(),
                 request.parts().size(),
-                request.parts().stream().mapToInt(Part::quantity).sum());
+                request.parts().stream().mapToInt(Part::quantity).sum(),
+                request.strategy());
 
         long start = System.currentTimeMillis();
         NestingResult result = NestingEngine.nest(request);

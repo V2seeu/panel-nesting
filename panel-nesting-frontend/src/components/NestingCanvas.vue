@@ -177,10 +177,6 @@ function onMouseMove(e: MouseEvent) {
 
   if (!props.result) return
 
-  const rect = canvas.getBoundingClientRect()
-  const x = e.clientX - rect.left
-  const y = e.clientY - rect.top
-
   const sheet = props.sheet
   const padding = 40
   const scaleX = (canvas.clientWidth - 2 * padding) / sheet.width

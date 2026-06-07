@@ -43,7 +43,10 @@ export interface NestingResult {
   sheets: SheetResult[]
 }
 
+export type OptimizationStrategy = 'UTILIZATION' | 'SHEET_COUNT' | 'MIN_SEAM' | 'ALIGN_EDGE'
+
 export interface NestingRequest {
   sheet: Sheet
   parts: Part[]
+  strategy: OptimizationStrategy
 }
