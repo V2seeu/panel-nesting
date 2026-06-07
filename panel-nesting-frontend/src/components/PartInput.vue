@@ -7,14 +7,30 @@
       <div class="part-color-bar" :style="{ backgroundColor: colors[idx % colors.length] }"></div>
       <div class="part-fields">
         <div class="part-row">
-          <el-input v-model="part.name" placeholder="名称" size="small" class="field-name" />
-          <el-input-number v-model="part.width" :min="1" placeholder="宽" size="small" controls-position="right" class="field-num" />
-          <el-input-number v-model="part.height" :min="1" placeholder="高" size="small" controls-position="right" class="field-num" />
-          <el-input-number v-model="part.quantity" :min="1" placeholder="数" size="small" controls-position="right" class="field-qty" />
-          <el-tooltip content="允许旋转90°" placement="top">
-            <el-checkbox v-model="part.rotatable" size="small" class="field-rotate">转</el-checkbox>
-          </el-tooltip>
-          <el-button type="danger" :icon="Delete" circle size="small" @click="parts.splice(idx, 1)" />
+          <div class="field-group">
+            <span class="field-label">名称</span>
+            <el-input v-model="part.name" size="small" class="field-name" />
+          </div>
+          <div class="field-group">
+            <span class="field-label">宽(mm)</span>
+            <el-input-number v-model="part.width" :min="1" size="small" controls-position="right" class="field-num" />
+          </div>
+          <div class="field-group">
+            <span class="field-label">高(mm)</span>
+            <el-input-number v-model="part.height" :min="1" size="small" controls-position="right" class="field-num" />
+          </div>
+          <div class="field-group">
+            <span class="field-label">数量</span>
+            <el-input-number v-model="part.quantity" :min="1" size="small" controls-position="right" class="field-qty" />
+          </div>
+          <div class="field-group field-group--checkbox">
+            <span class="field-label">旋转</span>
+            <el-checkbox v-model="part.rotatable" size="small" />
+          </div>
+          <div class="field-group field-group--delete">
+            <span class="field-label">&nbsp;</span>
+            <el-button type="danger" :icon="Delete" circle size="small" @click="parts.splice(idx, 1)" />
+          </div>
         </div>
       </div>
     </div>
@@ -73,8 +89,24 @@ function addPart() {
 }
 .part-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 4px;
+}
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.field-label {
+  font-size: 11px;
+  color: #909399;
+  padding-left: 2px;
+}
+.field-group--checkbox {
+  align-items: center;
+}
+.field-group--delete {
+  align-items: center;
 }
 .field-name {
   width: 70px;
@@ -87,10 +119,6 @@ function addPart() {
 .field-qty {
   width: 60px;
   flex-shrink: 0;
-}
-.field-rotate {
-  flex-shrink: 0;
-  margin-right: 0;
 }
 .part-item--highlighted {
   background-color: #ecf5ff;
