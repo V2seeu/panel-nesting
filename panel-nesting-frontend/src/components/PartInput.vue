@@ -1,5 +1,16 @@
 <template>
   <el-card header="零件列表">
+    <div class="header-row">
+      <span class="header-spacer"></span>
+      <div class="header-fields">
+        <span class="header-cell header-cell--name">名称</span>
+        <span class="header-cell header-cell--num">宽(mm)</span>
+        <span class="header-cell header-cell--num">高(mm)</span>
+        <span class="header-cell header-cell--qty">数量</span>
+        <span class="header-cell header-cell--checkbox">旋转</span>
+        <span class="header-cell header-cell--delete"></span>
+      </div>
+    </div>
     <div v-for="(part, idx) in parts" :key="idx" class="part-item"
          :class="{ 'part-item--highlighted': hoveredPartName === part.name }"
          @mouseenter="emit('hoverPart', part.name)"
@@ -7,30 +18,12 @@
       <div class="part-color-bar" :style="{ backgroundColor: colors[idx % colors.length] }"></div>
       <div class="part-fields">
         <div class="part-row">
-          <div class="field-group">
-            <span v-if="idx === 0" class="field-label">名称</span>
-            <el-input v-model="part.name" size="small" class="field-name" />
-          </div>
-          <div class="field-group">
-            <span v-if="idx === 0" class="field-label">宽(mm)</span>
-            <el-input-number v-model="part.width" :min="1" size="small" controls-position="right" class="field-num" />
-          </div>
-          <div class="field-group">
-            <span v-if="idx === 0" class="field-label">高(mm)</span>
-            <el-input-number v-model="part.height" :min="1" size="small" controls-position="right" class="field-num" />
-          </div>
-          <div class="field-group">
-            <span v-if="idx === 0" class="field-label">数量</span>
-            <el-input-number v-model="part.quantity" :min="1" size="small" controls-position="right" class="field-qty" />
-          </div>
-          <div class="field-group field-group--checkbox">
-            <span v-if="idx === 0" class="field-label">旋转</span>
-            <el-checkbox v-model="part.rotatable" size="small" />
-          </div>
-          <div class="field-group field-group--delete">
-            <span v-if="idx === 0" class="field-label">&nbsp;</span>
-            <el-button type="danger" :icon="Delete" circle size="small" @click="parts.splice(idx, 1)" />
-          </div>
+          <el-input v-model="part.name" size="small" class="field-name" />
+          <el-input-number v-model="part.width" :min="1" size="small" controls-position="right" class="field-num" />
+          <el-input-number v-model="part.height" :min="1" size="small" controls-position="right" class="field-num" />
+          <el-input-number v-model="part.quantity" :min="1" size="small" controls-position="right" class="field-qty" />
+          <el-checkbox v-model="part.rotatable" size="small" />
+          <el-button type="danger" :icon="Delete" circle size="small" @click="parts.splice(idx, 1)" />
         </div>
       </div>
     </div>
@@ -89,24 +82,51 @@ function addPart() {
 }
 .part-row {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 4px;
 }
-.field-group {
+.header-row {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #ebeef5;
 }
-.field-label {
+.header-spacer {
+  width: 6px;
+  flex-shrink: 0;
+}
+.header-fields {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.header-cell {
   font-size: 11px;
   color: #909399;
-  padding-left: 2px;
+  text-align: center;
 }
-.field-group--checkbox {
-  align-items: center;
+.header-cell--name {
+  width: 70px;
+  flex-shrink: 0;
 }
-.field-group--delete {
-  align-items: center;
+.header-cell--num {
+  width: 80px;
+  flex-shrink: 0;
+}
+.header-cell--qty {
+  width: 60px;
+  flex-shrink: 0;
+}
+.header-cell--checkbox {
+  flex-shrink: 0;
+  text-align: center;
+}
+.header-cell--delete {
+  flex-shrink: 0;
+  width: 24px;
 }
 .field-name {
   width: 70px;
