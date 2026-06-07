@@ -169,7 +169,7 @@ Response:
     {
       "index": 0,
       "placements": [
-        {"partName": "P1", "x": 10, "y": 10, "width": 100, "height": 200, "rotated": false}
+        {"partName": "P1", "partId": "p1", "x": 10, "y": 10, "width": 100, "height": 200, "rotated": false}
       ]
     }
   ]
