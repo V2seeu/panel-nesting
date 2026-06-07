@@ -1,8 +1,8 @@
 <template>
   <div class="nesting-page">
     <h1 class="page-title">CNC 拼板排样系统</h1>
-    <div class="main-layout">
-      <div class="left-panel">
+    <div class="main-layout" ref="layoutRef">
+      <div class="left-panel" :style="{ width: leftWidth + 'px' }">
         <SheetConfig v-model="sheet" />
         <PartInput v-model="parts" :hoveredPartName="hoveredPartName" @hoverPart="onCanvasHover" />
         <el-button type="primary" size="large" class="compute-btn"
@@ -10,6 +10,7 @@
           开始排样
         </el-button>
       </div>
+      <div class="resize-handle" @mousedown="onResizeStart"></div>
       <div class="right-panel">
         <NestingCanvas :result="result" :sheet="sheet" :parts="parts"
                        :hoveredPartName="hoveredPartName"
@@ -20,12 +21,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import SheetConfig from '../components/SheetConfig.vue'
 import PartInput from '../components/PartInput.vue'
 import NestingCanvas from '../components/NestingCanvas.vue'
 import { computeNesting } from '../api/nesting'
 import type { Sheet, Part, NestingResult } from '../types'
+
+const layoutRef = ref<HTMLDivElement>()
+const leftWidth = ref(420)
 
 const sheet = ref<Sheet>({
   width: 1220,
@@ -65,6 +69,43 @@ async function compute() {
 function onCanvasHover(name: string | null) {
   hoveredPartName.value = name
 }
+
+// --- Resize drag logic ---
+function onResizeStart(e: MouseEvent) {
+  e.preventDefault()
+  const startX = e.clientX
+  const startWidth = leftWidth.value
+  const layoutEl = layoutRef.value
+  if (!layoutEl) return
+  const layoutWidth = layoutEl.clientWidth
+
+  function onMouseMove(ev: MouseEvent) {
+    const dx = ev.clientX - startX
+    const newWidth = startWidth + dx
+    const minW = 280
+    const maxW = layoutWidth - 300
+    leftWidth.value = Math.max(minW, Math.min(maxW, newWidth))
+  }
+
+  function onMouseUp() {
+    document.removeEventListener('mousemove', onMouseMove)
+    document.removeEventListener('mouseup', onMouseUp)
+    document.body.style.cursor = ''
+    document.body.style.userSelect = ''
+  }
+
+  document.body.style.cursor = 'col-resize'
+  document.body.style.userSelect = 'none'
+  document.addEventListener('mousemove', onMouseMove)
+  document.addEventListener('mouseup', onMouseUp)
+}
+
+onMounted(() => {
+  // Default to 1/3 of layout width
+  if (layoutRef.value) {
+    leftWidth.value = Math.max(280, Math.floor(layoutRef.value.clientWidth / 3))
+  }
+})
 </script>
 
 <style scoped>
@@ -83,16 +124,26 @@ function onCanvasHover(name: string | null) {
 .main-layout {
   flex: 1;
   display: flex;
-  gap: 16px;
   min-height: 0;
 }
 .left-panel {
-  width: 380px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
   overflow-y: auto;
+  min-width: 0;
+}
+.resize-handle {
+  width: 8px;
+  cursor: col-resize;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.resize-handle:hover,
+.resize-handle:active {
+  background: linear-gradient(to right, transparent 3px, #409eff 3px, #409eff 5px, transparent 5px);
 }
 .right-panel {
   flex: 1;

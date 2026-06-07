@@ -109,18 +109,19 @@ function addPart() {
   text-align: center;
 }
 .header-cell--name {
-  width: 70px;
-  flex-shrink: 0;
+  flex: 3;
+  min-width: 50px;
 }
 .header-cell--num {
-  width: 80px;
-  flex-shrink: 0;
+  flex: 4;
+  min-width: 60px;
 }
 .header-cell--qty {
-  width: 60px;
-  flex-shrink: 0;
+  flex: 3;
+  min-width: 40px;
 }
 .header-cell--checkbox {
+  width: 40px;
   flex-shrink: 0;
   text-align: center;
 }
@@ -129,16 +130,16 @@ function addPart() {
   width: 24px;
 }
 .field-name {
-  width: 70px;
-  flex-shrink: 0;
+  flex: 3;
+  min-width: 50px;
 }
 .field-num {
-  width: 80px;
-  flex-shrink: 0;
+  flex: 4;
+  min-width: 60px;
 }
 .field-qty {
-  width: 60px;
-  flex-shrink: 0;
+  flex: 3;
+  min-width: 40px;
 }
 .part-item--highlighted {
   background-color: #ecf5ff;
