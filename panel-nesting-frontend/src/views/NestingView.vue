@@ -14,6 +14,7 @@
         <div class="resize-grip">
           <span></span><span></span><span></span>
         </div>
+        <div class="resize-tooltip" v-if="dragging">{{ dragPercent }}%</div>
       </div>
       <div class="right-panel">
         <NestingCanvas :result="result" :sheet="sheet" :parts="parts"
@@ -34,6 +35,8 @@ import type { Sheet, Part, NestingResult } from '../types'
 
 const layoutRef = ref<HTMLDivElement>()
 const leftWidth = ref(420)
+const dragging = ref(false)
+const dragPercent = ref(33)
 
 const sheet = ref<Sheet>({
   width: 1220,
@@ -89,15 +92,19 @@ function onResizeStart(e: MouseEvent) {
     const minW = 280
     const maxW = layoutWidth - 300
     leftWidth.value = Math.max(minW, Math.min(maxW, newWidth))
+    dragPercent.value = Math.round(leftWidth.value / layoutWidth * 100)
   }
 
   function onMouseUp() {
+    dragging.value = false
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
     document.body.style.cursor = ''
     document.body.style.userSelect = ''
   }
 
+  dragging.value = true
+  dragPercent.value = Math.round(leftWidth.value / layoutWidth * 100)
   document.body.style.cursor = 'col-resize'
   document.body.style.userSelect = 'none'
   document.addEventListener('mousemove', onMouseMove)
@@ -170,6 +177,29 @@ onMounted(() => {
   border-radius: 50%;
   background: #c0c4cc;
   transition: background 0.2s;
+}
+.resize-tooltip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateX(24px);
+  background: #303133;
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+.resize-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  border: 4px solid transparent;
+  border-right-color: #303133;
 }
 .right-panel {
   flex: 1;
