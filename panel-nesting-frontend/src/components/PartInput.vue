@@ -1,6 +1,9 @@
 <template>
   <el-card header="零件列表">
-    <div v-for="(part, idx) in parts" :key="idx" class="part-item">
+    <div v-for="(part, idx) in parts" :key="idx" class="part-item"
+         :class="{ 'part-item--highlighted': hoveredPartName === part.name }"
+         @mouseenter="emit('hoverPart', part.name)"
+         @mouseleave="emit('hoverPart', null)">
       <div class="part-color-bar" :style="{ backgroundColor: colors[idx % colors.length] }"></div>
       <div class="part-fields">
         <el-row :gutter="8">
@@ -39,7 +42,7 @@ defineProps<{
   hoveredPartName: string | null
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   hoverPart: [name: string | null]
 }>()
 
