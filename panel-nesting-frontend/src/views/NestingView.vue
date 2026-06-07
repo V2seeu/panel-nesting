@@ -11,10 +11,14 @@
         </el-button>
       </div>
       <div class="resize-handle" @mousedown="onResizeStart">
-        <div class="resize-grip">
-          <span></span><span></span><span></span>
-        </div>
-        <div class="resize-tooltip" v-if="dragging">{{ dragPercent }}%</div>
+        <template v-if="dragging">
+          <span class="resize-percent">{{ dragPercent }}%</span>
+        </template>
+        <template v-else>
+          <div class="resize-grip">
+            <span></span><span></span><span></span>
+          </div>
+        </template>
       </div>
       <div class="right-panel">
         <NestingCanvas :result="result" :sheet="sheet" :parts="parts"
@@ -112,9 +116,8 @@ function onResizeStart(e: MouseEvent) {
 }
 
 onMounted(() => {
-  // Default to 1/3 of layout width
   if (layoutRef.value) {
-    leftWidth.value = Math.max(280, Math.floor(layoutRef.value.clientWidth / 3))
+    leftWidth.value = Math.max(280, Math.floor(layoutRef.value.clientWidth * 0.22))
   }
 })
 </script>
@@ -178,28 +181,13 @@ onMounted(() => {
   background: #c0c4cc;
   transition: background 0.2s;
 }
-.resize-tooltip {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) translateX(24px);
-  background: #303133;
-  color: #fff;
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 10;
-}
-.resize-tooltip::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: 100%;
-  transform: translateY(-50%);
-  border: 4px solid transparent;
-  border-right-color: #303133;
+.resize-percent {
+  font-size: 11px;
+  color: #409eff;
+  font-weight: 600;
+  writing-mode: vertical-lr;
+  letter-spacing: 1px;
+  user-select: none;
 }
 .right-panel {
   flex: 1;
