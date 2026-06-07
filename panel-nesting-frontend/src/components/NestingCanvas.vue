@@ -175,7 +175,7 @@ function onMouseLeave() {
   emit('hoverPart', null)
 }
 
-watch(() => [props.sheet, props.result, currentSheet.value, props.hoveredPartName], draw)
+watch(() => [props.sheet, props.result, currentSheet.value, props.hoveredPartName], draw, { deep: true })
 
 let resizeObserver: ResizeObserver | null = null
 onMounted(() => {
