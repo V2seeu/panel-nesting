@@ -45,7 +45,7 @@ function getPartColor(partName: string): string {
 function draw() {
   const canvas = canvasRef.value
   const container = containerRef.value
-  if (!canvas || !container || !props.result) return
+  if (!canvas || !container) return
 
   const ctx = canvas.getContext('2d')!
   const dpr = window.devicePixelRatio || 1
@@ -92,7 +92,16 @@ function draw() {
     ctx.stroke()
   }
 
-  // Draw placements for current sheet
+  // Draw sheet dimensions label
+  ctx.fillStyle = '#999'
+  ctx.font = '12px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'top'
+  ctx.fillText(`${sheet.width} × ${sheet.height} mm`, offsetX + sheet.width * scale / 2, offsetY + sheet.height * scale + 8)
+
+  // Draw placements only when result exists
+  if (!props.result) return
+
   const sheetResult = props.result.sheets[currentSheet.value]
   if (!sheetResult) return
 
@@ -166,7 +175,7 @@ function onMouseLeave() {
   emit('hoverPart', null)
 }
 
-watch(() => [props.result, currentSheet.value, props.hoveredPartName], draw)
+watch(() => [props.sheet, props.result, currentSheet.value, props.hoveredPartName], draw)
 
 let resizeObserver: ResizeObserver | null = null
 onMounted(() => {
