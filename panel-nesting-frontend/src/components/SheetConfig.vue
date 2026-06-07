@@ -26,10 +26,16 @@
         </el-col>
       </el-row>
       <el-divider content-position="left">避让区域（定位孔）</el-divider>
-      <div v-for="(zone, idx) in sheet.avoidZones" :key="idx" style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-        <el-input-number v-model="zone.cx" :min="0" placeholder="X" size="small" style="width:25%" />
-        <el-input-number v-model="zone.cy" :min="0" placeholder="Y" size="small" style="width:25%" />
-        <el-input-number v-model="zone.radius" :min="1" placeholder="半径" size="small" style="width:25%" />
+      <div class="zone-header">
+        <span class="zone-header-cell">X(mm)</span>
+        <span class="zone-header-cell">Y(mm)</span>
+        <span class="zone-header-cell">半径(mm)</span>
+        <span class="zone-header-cell zone-header-cell--action"></span>
+      </div>
+      <div v-for="(zone, idx) in sheet.avoidZones" :key="idx" class="zone-row">
+        <el-input-number v-model="zone.cx" :min="0" size="small" class="zone-field" />
+        <el-input-number v-model="zone.cy" :min="0" size="small" class="zone-field" />
+        <el-input-number v-model="zone.radius" :min="1" size="small" class="zone-field" />
         <el-button type="danger" :icon="Delete" circle size="small" @click="sheet.avoidZones.splice(idx, 1)" />
       </div>
       <el-button type="primary" link size="small" @click="sheet.avoidZones.push({ cx: 0, cy: 0, radius: 8 })">
@@ -45,3 +51,37 @@ import type { Sheet } from '../types'
 
 const sheet = defineModel<Sheet>({ required: true })
 </script>
+
+<style scoped>
+.zone-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #ebeef5;
+}
+.zone-header-cell {
+  flex: 1;
+  font-size: 11px;
+  color: #909399;
+  text-align: center;
+}
+.zone-header-cell--action {
+  flex: none;
+  width: 24px;
+}
+.zone-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.zone-field {
+  flex: 1;
+}
+.zone-field :deep(.el-input__wrapper) {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+</style>
