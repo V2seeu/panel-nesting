@@ -10,7 +10,11 @@
           开始排样
         </el-button>
       </div>
-      <div class="resize-handle" @mousedown="onResizeStart"></div>
+      <div class="resize-handle" @mousedown="onResizeStart">
+        <div class="resize-grip">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
       <div class="right-panel">
         <NestingCanvas :result="result" :sheet="sheet" :parts="parts"
                        :hoveredPartName="hoveredPartName"
@@ -135,15 +139,37 @@ onMounted(() => {
   min-width: 0;
 }
 .resize-handle {
-  width: 8px;
+  width: 14px;
   cursor: col-resize;
   flex-shrink: 0;
-  position: relative;
-  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f7fa;
+  border-left: 1px solid #e4e7ed;
+  border-right: 1px solid #e4e7ed;
+  transition: background 0.2s;
 }
-.resize-handle:hover,
-.resize-handle:active {
-  background: linear-gradient(to right, transparent 3px, #409eff 3px, #409eff 5px, transparent 5px);
+.resize-handle:hover {
+  background: #ecf5ff;
+  border-color: #409eff;
+}
+.resize-handle:hover .resize-grip span {
+  background: #409eff;
+}
+.resize-grip {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+}
+.resize-grip span {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #c0c4cc;
+  transition: background 0.2s;
 }
 .right-panel {
   flex: 1;
